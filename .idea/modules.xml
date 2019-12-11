@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/OpenLAP-AnalyticsFramework.iml" filepath="$PROJECT_DIR$/OpenLAP-AnalyticsFramework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../OpenLAP-AnalyticsMethodTemplate/OpenLAP-AnalyticsMethodTemplate.iml" filepath="$PROJECT_DIR$/../OpenLAP-AnalyticsMethodTemplate/OpenLAP-AnalyticsMethodTemplate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../OpenLAP-DataExchangeFormats/OpenLAP-DataExchangeFormats.iml" filepath="$PROJECT_DIR$/../OpenLAP-DataExchangeFormats/OpenLAP-DataExchangeFormats.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../OpenLAP-VisualizationTechniqueTemplate/OpenLAP-VisualizationTechniqueTemplate.iml" filepath="$PROJECT_DIR$/../OpenLAP-VisualizationTechniqueTemplate/OpenLAP-VisualizationTechniqueTemplate.iml" />
+    </modules>
+  </component>
+</project>
