@@ -10,8 +10,7 @@ import org.xeustechnologies.jcl.proxy.ProxyProviderFactory;
 
 /**
  * A custom Java Class Path Loader that is responsible of loading JARs dynamically to the active ClassPath.
- * It uses the JCL developed by Kamran Zafar(http://kamranzafar.org/)
- * and available at https://github.com/kamranzafar/JCL/
+ * It uses the JCL';
  */
 public class AnalyticsMethodsClassPathLoader {
 

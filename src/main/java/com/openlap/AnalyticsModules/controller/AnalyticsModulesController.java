@@ -135,6 +135,17 @@ public class AnalyticsModulesController {
 
     //region AnalyticsGoals
 
+    @RequestMapping(
+            value = "/AnalyticsModules/AnalyticsGoals/PopulateSampleGoals",
+            method = RequestMethod.GET
+    )
+    public
+    @ResponseBody
+    boolean populateSampleGoals(){
+    return modulesService.populateSampleGoals();
+    }
+
+
     /**
      * HTTP endpoint handler method to get a AnalyticsGoal by its ID.
      *

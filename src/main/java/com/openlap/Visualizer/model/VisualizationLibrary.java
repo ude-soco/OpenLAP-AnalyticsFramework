@@ -16,14 +16,11 @@ import java.util.*;
 @JsonIgnoreProperties
 public class VisualizationLibrary {
 
-    //@GeneratedValue(strategy = GenerationType.TABLE,generator="sequence_generator")
-    // @GeneratedValue(generator = "uuid")
-    // @GenericGenerator(name = "uuid", strategy = "uuid2")
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+//    @GeneratedValue(generator = "uuid")
+//    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Type(type = "objectid")
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     String id;
 
     //@Column(unique = true, nullable = false)

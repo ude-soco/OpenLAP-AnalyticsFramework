@@ -59,7 +59,7 @@ public class AnalyticsGoal {
         this.name = name;
         this.description = description;
         this.author = author;
-        this.isActive = false;
+        this.isActive = isActive;
         this.analyticsMethods = analyticsMethods;
     }
 
@@ -120,7 +120,7 @@ public class AnalyticsGoal {
     }
 
     /**
-     * @return true if the Analyics Goal is active, i.e. can be related with Analyits Methods. False otheriwse.
+     * @return true if the Analytics Goal is active.
      */
     public boolean isActive() {
         return isActive;
@@ -130,7 +130,7 @@ public class AnalyticsGoal {
      * @param isActive Flag to be set.
      */
     public void setActive(boolean isActive) {
-        isActive = isActive;
+        this.isActive = isActive;
     }
 
     /**

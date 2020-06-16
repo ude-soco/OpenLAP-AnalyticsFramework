@@ -2155,6 +2155,26 @@ public class AnalyticsEngineService {
         return allplatforms;
     }
 
+    public String initializeDatabase(HttpServletRequest request) {
+        String baseUrl = String.format("%s://%s:%d", request.getScheme(), request.getServerName(), request.getServerPort());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/AnalyticsGoals/PopulateSampleGoals");
+        } catch (Exception exc) {
+            System.out.println("Adding Analytics Goals: "+ exc.getMessage());
+        }
+
+        try {
+            performGetRequest(baseUrl + "/AnalyticsMethod/PopulateAnalyticsMethods");
+        } catch (Exception exc) {
+            System.out.println("Adding Analytics Methods: "+ exc.getMessage());
+        }
+
+        return "Success";
+    }
+
 
     //HTTP Section
 

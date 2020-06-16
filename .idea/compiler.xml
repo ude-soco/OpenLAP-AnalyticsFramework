@@ -6,10 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="OpenLAP-AnalyticsFramework" />
         <module name="OpenLAP-AnalyticsMethodTemplate" />
         <module name="OpenLAP-DataExchangeFormats" />
         <module name="OpenLAP-VisualizationTechniqueTemplate" />
+        <module name="OpenLAP-AnalyticsFramework" />
         <module name="Visualizer-GoogleCharts" />
       </profile>
     </annotationProcessing>
@@ -26,7 +26,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="OpenLAP-AnalyticsFramework" options="" />
+      <module name="OpenLAP-AnalyticsFramework" options="-parameters" />
     </option>
   </component>
 </project>

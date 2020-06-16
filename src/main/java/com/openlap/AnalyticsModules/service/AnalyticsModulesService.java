@@ -1,5 +1,8 @@
 package com.openlap.AnalyticsModules.service;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlap.AnalyticsMethods.exceptions.AnalyticsMethodNotFoundException;
 import com.openlap.AnalyticsMethods.model.AnalyticsMethods;
 import com.openlap.AnalyticsMethods.services.AnalyticsMethodsService;
@@ -15,24 +18,31 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import javax.transaction.TransactionManager;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * This service handles the "business logic" of the macro component. It also works as a facade for other
  * macro components that happen to be running on the same server, i.e. the Analytics Engine and Analytics Methods
- *
+ * <p>
  * Created by Faizan Riaz on 12.06.2019.
  */
 @Service
 public class AnalyticsModulesService {
 
-    private static final Logger log =  LoggerFactory.getLogger(OpenLAPAnalyaticsFramework.class);
+    private static final Logger log = LoggerFactory.getLogger(OpenLAPAnalyaticsFramework.class);
 
     @Autowired
     AnalyticsMethodsService analyticsMethodsService;
@@ -61,9 +71,9 @@ public class AnalyticsModulesService {
             String query = "FROM AnalyticsMethods";
             List<AnalyticsMethods> analyticsMethods = em.createQuery(query, AnalyticsMethods.class).getResultList();
 
-            if(analyticsMethods == null) {
+            if (analyticsMethods == null) {
                 areAllMethodAvailable = false;
-               methodNotAvailableId = methodEntry.getValue().getId();
+                methodNotAvailableId = methodEntry.getValue().getId();
                 break;
             }
         }
@@ -84,8 +94,7 @@ public class AnalyticsModulesService {
                 e.printStackTrace();
                 throw new AnalyticsModulesBadRequestException(e.getMessage());
             }
-        }
-        else {
+        } else {
             throw new AnalyticsMethodNotFoundException("Method with id: {"
                     + methodNotAvailableId
                     + "} not found.");
@@ -99,7 +108,7 @@ public class AnalyticsModulesService {
      * @return the Triad with the specified ID
      */
     public Triad getTriadById(String id) throws TriadNotFoundException {
-        Triad result = em.find(Triad.class,id);
+        Triad result = em.find(Triad.class, id);
         if (result == null || id == null) {
             throw new TriadNotFoundException("Triad with id: {" + id + "} not found");
         } else {
@@ -120,7 +129,7 @@ public class AnalyticsModulesService {
     }
 
     public List<Triad> getTriadsByUser(String userName) {
-        String query = "from Triad where createdBy = "+userName+" ";
+        String query = "from Triad where createdBy = " + userName + " ";
         List<Triad> triad = em.createQuery(query).getResultList();
         return triad;
     }
@@ -137,7 +146,7 @@ public class AnalyticsModulesService {
                     + triadId + "} not found.");
         }
         em.getTransaction().begin();
-        em.remove( triad );
+        em.remove(triad);
         em.getTransaction().commit();
     }
 
@@ -179,7 +188,7 @@ public class AnalyticsModulesService {
      * @return the AnalyticsGoal with the specified ID
      */
     public AnalyticsGoal getAnalyticsGoalById(String id) {
-        AnalyticsGoal result = em.find(AnalyticsGoal.class,id);
+        AnalyticsGoal result = em.find(AnalyticsGoal.class, id);
         if (result == null || id == null) {
             throw new AnalyticsGoalNotFoundException("AnalyticsGoal with id: {" + id + "} not found");
         } else {
@@ -229,7 +238,6 @@ public class AnalyticsModulesService {
      * @return returns an ArrayList with all the existing AnalyticsGoals.
      */
     public List<AnalyticsGoal> getActiveAnalyticsGoals() {
-
         String query = "FROM AnalyticsGoal WHERE isActive = true ORDER by name ASC";
         List<AnalyticsGoal> analyticsGoals = em.createQuery(query).getResultList();
         return analyticsGoals;
@@ -242,7 +250,7 @@ public class AnalyticsModulesService {
      * @return the saved AnalyticsGoal with the set active status
      */
     public AnalyticsGoal setAnalyticsGoalActive(String id, boolean status) {
-        AnalyticsGoal analyticsGoal = em.find(AnalyticsGoal.class,id);
+        AnalyticsGoal analyticsGoal = em.find(AnalyticsGoal.class, id);
         analyticsGoal.setActive(status);
         return analyticsGoal;
     }
@@ -250,7 +258,7 @@ public class AnalyticsModulesService {
     /**
      * Attach an AnalyticsMethodMetadata to a AnalyticsGoal
      *
-     * @param id         the id of the AnalyticsGoal to attach the AnalyticsMethodMetadata to
+     * @param id               the id of the AnalyticsGoal to attach the AnalyticsMethodMetadata to
      * @param analyticsMethods the AnalyticsMethodMetadata to be attached
      * @return the new AnalyticsGoal with the attached AnalyticsMethodMetadata
      */
@@ -258,8 +266,8 @@ public class AnalyticsModulesService {
         //Check that AnalyticsGoal exists
         //Check that AnalyticsMethod exists
 
-        AnalyticsMethods requestedAnalyticsMethod = em.find( AnalyticsMethods.class, analyticsMethods.getId());
-        AnalyticsGoal responseAnalyticsGoal = em.find(AnalyticsGoal.class, id );
+        AnalyticsMethods requestedAnalyticsMethod = em.find(AnalyticsMethods.class, analyticsMethods.getId());
+        AnalyticsGoal responseAnalyticsGoal = em.find(AnalyticsGoal.class, id);
         //Set<AnalyticsMethods> analyticsMethodsSet = new HashSet<AnalyticsMethods>();
         if (responseAnalyticsGoal == null) {
             throw new AnalyticsModulesBadRequestException("Analytics Goal with id = {"
@@ -273,14 +281,14 @@ public class AnalyticsModulesService {
             throw new AnalyticsModulesBadRequestException("Analytics Goal with id = {"
                     + analyticsMethods.getId() + "} must be active to attach Analytics Methods to it.");
         }
-            //Attach analyticsMethod if it does not exist in the AnalyticsGoal
+        //Attach analyticsMethod if it does not exist in the AnalyticsGoal
 
-            responseAnalyticsGoal.setAnalyticsMethods(requestedAnalyticsMethod);
-            //Return the AnalyticsGoal with the attached
-            em.getTransaction().begin();
-            em.merge(responseAnalyticsGoal);
-            em.flush();
-            em.getTransaction().commit();
+        responseAnalyticsGoal.setAnalyticsMethods(requestedAnalyticsMethod);
+        //Return the AnalyticsGoal with the attached
+        em.getTransaction().begin();
+        em.merge(responseAnalyticsGoal);
+        em.flush();
+        em.getTransaction().commit();
 
 
         return responseAnalyticsGoal;
@@ -322,9 +330,42 @@ public class AnalyticsModulesService {
                     + AnalyticsGoalId + "} not found.");
         }
         em.getTransaction().begin();
-        em.remove( analyticsGoal );
+        em.remove(analyticsGoal);
         em.getTransaction().commit();
 
+    }
+
+    public boolean populateSampleGoals() {
+        List<AnalyticsGoal> goals;
+        List<AnalyticsGoal> allGoals = getAllAnalyticsGoals();
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            em.getTransaction().begin();
+
+            try {
+                File jsonFile = ResourceUtils.getFile("classpath:SampleGoal.json");
+                goals = mapper.readValue(jsonFile, mapper.getTypeFactory().constructCollectionType(List.class, AnalyticsGoal.class));
+
+                for (AnalyticsGoal goal : goals) {
+                    if(!allGoals.stream().anyMatch(c -> c.getName().equals(goal.getName())))
+                        em.persist(goal);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            em.flush();
+            em.clear();
+            em.getTransaction().commit();
+        } catch (DataIntegrityViolationException sqlException) {
+            sqlException.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return true;
     }
 
     //endregion

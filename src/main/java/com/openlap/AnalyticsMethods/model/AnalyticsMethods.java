@@ -7,35 +7,38 @@ import javax.persistence.*;
 import java.util.Objects;
 
 /**
- *  Created by Faizan Riaz on 12/06/19.
+ * Created by Faizan Riaz on 12/06/19.
  */
 
 @Entity
-public class AnalyticsMethods{
+public class AnalyticsMethods {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Type(type = "objectid")
     String id;
 
+    @Column(nullable = false)
     public String description;
 
+    @Column(nullable = false)
     public String name;
 
-    public String binaries_location;
+    //public String binaries_location;
 
+    @Column(nullable = false)
     public String creator;
 
+    @Column(nullable = false)
     public String filename;
 
+    @Column(nullable = false)
     public String implementing_class;
 
 
     /**
-     *
      * Getter and Setters for the Upload Method
      */
-    public String  getId() {
+    public String getId() {
         return id;
     }
 
@@ -59,13 +62,13 @@ public class AnalyticsMethods{
         this.name = name;
     }
 
-    public String getBinaries_location() {
-        return binaries_location;
-    }
-
-    public void setBinaries_location(String binaries_location) {
-        this.binaries_location = binaries_location;
-    }
+//    public String getBinaries_location() {
+//        return binaries_location;
+//    }
+//
+//    public void setBinaries_location(String binaries_location) {
+//        this.binaries_location = binaries_location;
+//    }
 
     public String getCreator() {
         return creator;
@@ -74,6 +77,7 @@ public class AnalyticsMethods{
     public void setCreator(String creator) {
         this.creator = creator;
     }
+
     public String getFilename() {
         return filename;
     }
@@ -94,10 +98,10 @@ public class AnalyticsMethods{
      * Empty constructor.
      */
     public AnalyticsMethods() {
-        this.name = null;
+        this.name = "";
         this.creator = "";
         this.description = "";
-        this.binaries_location = null;
+        //this.binaries_location = null;
         this.implementing_class = "";
         this.filename = "";
     }
@@ -107,24 +111,28 @@ public class AnalyticsMethods{
      *
      * @param name              Name of the Analytics Method
      * @param creator           Creator of te Analytics Method
-     * @param description       Short description of the Analytisc Method
+     * @param description       Short description of the Analytics Method
      * @param implementingClass Class that implements the OpenLAP-AnalyticsFramework
-     * @param binariesLocation  Path of the server where the JAR files of the Analytics Method are located.
+     * @param filename          File name of the JAR containing the Analytics Method
      */
     public AnalyticsMethods(String name, String creator, String description,
-                            String implementingClass, String binariesLocation) {
+                            String implementingClass, String filename) {
         this.name = name;
         this.creator = creator;
         this.description = description;
         this.implementing_class = implementingClass;
-        this.binaries_location = binariesLocation;
+        //this.binaries_location = binariesLocation;
+        this.filename = filename;
     }
 
     @Override
-    public String toString(){
-        return "id:"+ this.id + ",description:" + this.description + ",name:" + this.name + ",binaries_location:" + this.binaries_location +
+    public String toString() {
+//        return "id:"+ this.id + ",description:" + this.description + ",name:" + this.name + ",binaries_location:" + this.binaries_location +
+//                ",creator:" + this.creator + ",filename:" + this.filename + ",implementing_class:" + this.implementing_class;
+        return "id:" + this.id + ",description:" + this.description + ",name:" + this.name +
                 ",creator:" + this.creator + ",filename:" + this.filename + ",implementing_class:" + this.implementing_class;
     }
+
     /**
      * Cloning Method for the AnalyticsMethods Metadata.
      *
@@ -141,6 +149,7 @@ public class AnalyticsMethods{
      * @param updatedMetadata updated metadata about the analytics method
      */
     public void updateWithMetadata(AnalyticsMethods updatedMetadata) {
+        this.setName(updatedMetadata.getName());
         this.setCreator(updatedMetadata.getCreator());
         this.setDescription(updatedMetadata.getDescription());
         this.setImplementing_class(updatedMetadata.getImplementing_class());
@@ -159,14 +168,15 @@ public class AnalyticsMethods{
         if (!getCreator().equals(that.getCreator())) return false;
         if (!getDescription().equals(that.getDescription())) return false;
         if (!getImplementing_class().equals(that.getImplementing_class())) return false;
-        if (!getBinaries_location().equals(that.getBinaries_location())) return false;
+        //if (!getBinaries_location().equals(that.getBinaries_location())) return false;
         return getFilename().equals(that.getFilename());
 
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, description, name, binaries_location, creator, filename, implementing_class);
+        //return Objects.hash(id, description, name, binaries_location, creator, filename, implementing_class);
+        return Objects.hash(id, description, name, creator, filename, implementing_class);
     }
 
 }

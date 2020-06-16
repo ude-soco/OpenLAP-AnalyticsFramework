@@ -15,7 +15,6 @@ import com.openlap.dataset.OpenLAPColumnConfigData;
 import com.openlap.dataset.OpenLAPDataSet;
 import com.openlap.dynamicparam.OpenLAPDynamicParam;
 import com.openlap.exceptions.OpenLAPDataColumnException;
-import org.bson.types.ObjectId;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -63,7 +62,7 @@ public class AnalyticsEngineController {
         return analyticsEngineService.getAllGoals(request);
     }
 
-    @RequestMapping(value = {"/GetGoals/", "/GetActiveGoals"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/GetActiveGoals/", "/GetActiveGoals"}, method = RequestMethod.GET)
     public
     @ResponseBody
     List<AnalyticsGoal> GetActiveGoals(@RequestParam(value = "uid", required = false) String uid,
@@ -325,5 +324,12 @@ public class AnalyticsEngineController {
     @ResponseBody
     OpenLAPDataSet getallplatforms() throws OpenLAPDataColumnException, JSONException {
         return analyticsEngineService.getallplatforms();
+    }
+
+    @RequestMapping(value = {"/initializedatabase"}, method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String initializeDatabase(HttpServletRequest request) {
+        return analyticsEngineService.initializeDatabase(request);
     }
 }

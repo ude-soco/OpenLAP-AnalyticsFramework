@@ -40,6 +40,16 @@ public class AnalyticsMethodsController {
     @Autowired
     AnalyticsMethodsService analyticsMethodsService;
 
+    @RequestMapping(
+            value = "/PopulateAnalyticsMethods",
+            method = RequestMethod.GET
+    )
+    public
+    @ResponseBody
+    boolean populateAnalyticsMethods(){
+        return analyticsMethodsService.populateAnalyticsMethods();
+    }
+
     /**
      * HTTP endpoint handler method that lists all the Metadata of the  AnalyticsMethods available
      *
