@@ -1,6 +1,12 @@
 .env
 .env.*
 .idea/
-/target/
+.settings
+.classpath
+.project
 .vscode
+
+/target/
 /ObjectStore/
+/bin/
+
