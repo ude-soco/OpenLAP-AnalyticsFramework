@@ -3,6 +3,7 @@ package com.openlap.AnalyticsModules.model;
 import com.openlap.AnalyticsEngine.model.Indicator;
 import com.openlap.AnalyticsEngine.model.Question;
 import com.openlap.dataset.OpenLAPPortConfig;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -21,8 +22,10 @@ import java.util.Set;
 public class Triad {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Type(type = "objectid")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Type(type = "objectid")
     String id;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)

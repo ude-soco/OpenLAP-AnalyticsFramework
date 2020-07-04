@@ -1,6 +1,8 @@
 package com.openlap.Visualizer.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -16,20 +18,17 @@ import java.util.*;
 @JsonIgnoreProperties
 public class VisualizationLibrary {
 
-    //@GeneratedValue(strategy = GenerationType.TABLE,generator="sequence_generator")
-    // @GeneratedValue(generator = "uuid")
-    // @GenericGenerator(name = "uuid", strategy = "uuid2")
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @Type(type = "objectid")
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Type(type = "objectid")
     String id;
 
     //@Column(unique = true, nullable = false)
     String name;
 
-   // @Column(nullable = false)
+    // @Column(nullable = false)
     String creator;
 
     String description;
@@ -37,7 +36,7 @@ public class VisualizationLibrary {
     //@Column(nullable = false)
     String frameworkLocation;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER, mappedBy="visualizationLibrary")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER, mappedBy = "visualizationLibrary")
     private List<VisualizationType> visualizationTypes;
 
 
@@ -52,15 +51,6 @@ public class VisualizationLibrary {
         this.frameworkLocation = frameworkLocation;
         this.visualizationTypes = new ArrayList<>();
     }
-
-/*
-    public VisualizationLibrary(String name, String creator, String description, String frameworkLocation) {
-        this.name = name;
-        this.creator = creator;
-        this.description = description;
-        this.frameworkLocation = frameworkLocation;
-    }
-*/
 
     public String getId() {
         return id;
@@ -111,21 +101,39 @@ public class VisualizationLibrary {
         this.visualizationTypes = visualizationTypes;
     }
 
+//    @Override
+//    public String toString() {
+//        return "Vis Framework details :[id:" + id + ",name:" + name + ",creator:" + creator + ",description:" + description + ",location:" + frameworkLocation + "]";
+//    }
+
+
     @Override
     public String toString() {
-        return "Vis Framework details :[id:" + id + ",name:" + name + ",creator:" + creator + ",description:" + description + ",location:" + frameworkLocation + "]";
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            return "VisualizationLibrary{" +
+                    "id='" + id + '\'' +
+                    ", name='" + name + '\'' +
+                    ", creator='" + creator + '\'' +
+                    ", description='" + description + '\'' +
+                    ", frameworkLocation='" + frameworkLocation + '\'' +
+                    ", visualizationTypes=" + visualizationTypes +
+                    '}';
+        }
     }
 
-  @Override
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VisualizationLibrary that = (VisualizationLibrary) o;
         return id.equals(that.id) &&
-                 name.equals(that.getName()) &&
+                name.equals(that.getName()) &&
                 creator.equals(that.getCreator()) &&
                 description.equals(that.getDescription()) &&
-                frameworkLocation.equals(that.getFrameworkLocation()) ;
+                frameworkLocation.equals(that.getFrameworkLocation());
     }
 
     @Override

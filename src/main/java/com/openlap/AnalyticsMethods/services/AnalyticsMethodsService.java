@@ -7,6 +7,7 @@ import com.openlap.AnalyticsMethods.exceptions.AnalyticsMethodsBadRequestExcepti
 import com.openlap.AnalyticsMethods.exceptions.AnalyticsMethodsUploadErrorException;
 import com.openlap.AnalyticsMethods.model.AnalyticsMethods;
 import com.openlap.OpenLAPAnalyaticsFramework;
+import com.openlap.Common.Utils;
 import com.openlap.template.AnalyticsMethod;
 import com.openlap.dataset.OpenLAPColumnConfigData;
 import com.openlap.dataset.OpenLAPDataSetConfigValidationResult;
@@ -16,27 +17,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.transaction.TransactionManager;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This service handles the "business logic" of the macro component. It also works as a facade for other
  * macro components that happen to be running on the same server, i.e. the Analytics Engine and Analytics Modules
- *
+ * <p>
  * Created by Faizan Riaz on 12/06/19.
  */
 
@@ -49,7 +51,7 @@ public class AnalyticsMethodsService {
     private static final String TEMP_FILE_SUFIX = "_temp";
     private static final String INPUT_PORTS = "input";
     private static final String OUTPUT_PORTS = "output";
-    private static final Logger log =  LoggerFactory.getLogger(OpenLAPAnalyaticsFramework.class);
+    private static final Logger log = LoggerFactory.getLogger(OpenLAPAnalyaticsFramework.class);
 
     @Value("${analytics.jars.folder}")
     String analyticsMethodsJarsFolder;
@@ -65,11 +67,14 @@ public class AnalyticsMethodsService {
         classPathLoader =  new AnalyticsMethodsClassPathLoader(analyticsMethodsJarsFolder + "");
     }*/
 
-    public AnalyticsMethodsClassPathLoader getFolderNameFromResources()
-    {
-        System.out.println(analyticsMethodsJarsFolder);
-        AnalyticsMethodsClassPathLoader classPathLoader =  new AnalyticsMethodsClassPathLoader(analyticsMethodsJarsFolder);
-      return classPathLoader;
+    public AnalyticsMethodsClassPathLoader getFolderNameFromResources() {
+        AnalyticsMethodsClassPathLoader classPathLoader = new AnalyticsMethodsClassPathLoader(analyticsMethodsJarsFolder);
+        return classPathLoader;
+    }
+
+    public AnalyticsMethodsClassPathLoader getFolderNameFromResources(String jarFileName) {
+        AnalyticsMethodsClassPathLoader classPathLoader = new AnalyticsMethodsClassPathLoader(jarFileName);
+        return classPathLoader;
     }
 
     public AnalyticsMethod loadAnalyticsMethodInstance(String analyticsMethodId, AnalyticsMethodsClassPathLoader classPathLoader) throws AnalyticsMethodLoaderException {
@@ -80,11 +85,12 @@ public class AnalyticsMethodsService {
 
             AnalyticsMethod method;
 
-           // AnalyticsMethodsClassPathLoader classPathLoader =  new AnalyticsMethodsClassPathLoader(analyticsMethodsJarsFolder);
+            // AnalyticsMethodsClassPathLoader classPathLoader =  new AnalyticsMethodsClassPathLoader(analyticsMethodsJarsFolder);
             method = classPathLoader.loadClass(analyticsMethodMetadata.getImplementing_class());
             return method;
         }
     }
+
     TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
     EntityManagerFactory factory = Persistence.createEntityManagerFactory("OpenLAP");
     EntityManager em = factory.createEntityManager();
@@ -96,10 +102,11 @@ public class AnalyticsMethodsService {
      * @return A List of the available AnalyticsMethods
      */
     public List<AnalyticsMethods> viewAllAnalyticsMethods() {
-        String query = "From AnalyticsMethods a ORDER by a.filename  ASC";
+        String query = "From AnalyticsMethods a ORDER by a.name  ASC";
         List<AnalyticsMethods> analyticsMethodsModels = em.createQuery(query, AnalyticsMethods.class).getResultList();
-        return  analyticsMethodsModels;
+        return analyticsMethodsModels;
     }
+
     /**
      * Returns the Metadata of the Analytics Method of the specified ID
      *
@@ -116,7 +123,7 @@ public class AnalyticsMethodsService {
      * Post an AnalyticsMethods to the Server to be validated and made available for usage.
      *
      * @param analyticsMethod The metadata to upload as manifest of the AnalyticsMethods
-     * @param jarBundle      The JAR file with the implementation of the AnalyticsMethods
+     * @param jarBundle       The JAR file with the implementation of the AnalyticsMethods
      * @return The Metadata of the uploaded AnalyticsMethods if deemed valid by the OpenLAP
      */
     public AnalyticsMethods uploadAnalyticsMethod(
@@ -141,7 +148,7 @@ public class AnalyticsMethodsService {
                 } else {
                     log.info(validationInformation.getMessage());
                     // Stamp the location of the method in metadata and save it
-                    analyticsMethod.setBinaries_location(analyticsMethodsJarsFolder);
+                    //analyticsMethod.setBinaries_location(analyticsMethodsJarsFolder);
                     tm.begin();
                     em.persist(analyticsMethod);
                     //Commit
@@ -167,8 +174,8 @@ public class AnalyticsMethodsService {
      * Update an AnalyticsMethods to the Server to be validated and made available for usage.
      *
      * @param analyticsMethods The metadata to upload as manifest of the AnalyticsMethods
-     * @param id             ID of the AnalyticsMethods Metadata that is to be updated.
-     * @param jarBundle      The JAR file with the implementation of the AnalyticsMethods
+     * @param id               ID of the AnalyticsMethods Metadata that is to be updated.
+     * @param jarBundle        The JAR file with the implementation of the AnalyticsMethods
      * @return The Metadata of the uploaded AnalyticsMethods if deemed valid by the OpenLAP
      */
     public AnalyticsMethods updateAnalyticsMethod(AnalyticsMethods analyticsMethods, String id, MultipartFile jarBundle) {
@@ -304,7 +311,7 @@ public class AnalyticsMethodsService {
     private List<OpenLAPColumnConfigData> getPortsForMethod(String id, String portParameter)
             throws AnalyticsMethodLoaderException {
 
-        AnalyticsMethod method = loadAnalyticsMethodInstance(id,this.getFolderNameFromResources());
+        AnalyticsMethod method = loadAnalyticsMethodInstance(id, this.getFolderNameFromResources());
         //log.info("Attempting to return " + portParameter + " ports of the method with id {" + id + "}");
 
         List<OpenLAPColumnConfigData> ports;
@@ -334,18 +341,75 @@ public class AnalyticsMethodsService {
         try {
             AnalyticsMethodsFileHandler fileHandler = new AnalyticsMethodsFileHandler(log);
             em.getTransaction().begin();
-            AnalyticsMethods analyticsMethods = em.find( AnalyticsMethods.class, id);
+            AnalyticsMethods analyticsMethods = em.find(AnalyticsMethods.class, id);
             if (analyticsMethods == null || id == null) {
                 throw new AnalyticsMethodNotFoundException("Analytics Method with id = {"
                         + id + "} not found.");
             }
             // Delete Files
             fileHandler.deleteFile(analyticsMethodsJarsFolder, analyticsMethods.getFilename());
-            em.remove( analyticsMethods );
+            em.remove(analyticsMethods);
             em.getTransaction().commit();
-        }
-        catch ( Exception e ) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean populateAnalyticsMethods() {
+        List<AnalyticsMethods> allAnalyticsMethods = viewAllAnalyticsMethods();
+
+        try (Stream<Path> walk = Files.walk(Paths.get(analyticsMethodsJarsFolder))) {
+
+            List<String> jarFiles = walk.filter(Files::isRegularFile)
+                    .map(x -> x.toString()).collect(Collectors.toList());
+
+            for (String jarFile : jarFiles) {
+                List<String> classNames = Utils.getClassNamesFromJar(jarFile);
+
+                AnalyticsMethodsClassPathLoader analyticsMethodsClassPathLoader = getFolderNameFromResources(jarFile);
+                List<AnalyticsMethods> newMethods = new ArrayList<>();
+
+                for (String className : classNames) {
+
+                    try {
+                        AnalyticsMethod method = analyticsMethodsClassPathLoader.loadClass(className);
+
+                        if (!allAnalyticsMethods.stream().anyMatch(c -> c.getImplementing_class().equals(className))) {
+                            AnalyticsMethods newMethod = new AnalyticsMethods();
+                            newMethod.setName(method.getAnalyticsMethodName());
+                            newMethod.setDescription(method.getAnalyticsMethodDescription());
+                            newMethod.setCreator(method.getAnalyticsMethodCreator());
+                            newMethod.setImplementing_class(className);
+                            newMethod.setFilename(jarFile);
+
+                            newMethods.add(newMethod);
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Class does not inherit 'Analytics Method' class :" + className);
+                    }
+                }
+
+                try {
+                    em.getTransaction().begin();
+
+                    for (AnalyticsMethods method : newMethods) {
+                        em.persist(method);
+                    }
+
+                    em.flush();
+                    em.clear();
+                    em.getTransaction().commit();
+                } catch (DataIntegrityViolationException sqlException) {
+                    sqlException.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
     }
 }

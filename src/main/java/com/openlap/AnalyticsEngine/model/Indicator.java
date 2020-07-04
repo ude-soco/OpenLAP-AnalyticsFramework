@@ -3,6 +3,7 @@ package com.openlap.AnalyticsEngine.model;
 
 import com.openlap.AnalyticsEngine.dto.QueryParameters;
 import com.openlap.AnalyticsModules.model.OpenLAPDataSetMergeMapping;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -18,8 +19,10 @@ import java.util.Objects;
 @Entity
 public class Indicator {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Type(type = "objectid")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Type(type = "objectid")
     private String id;
 
     private String type;

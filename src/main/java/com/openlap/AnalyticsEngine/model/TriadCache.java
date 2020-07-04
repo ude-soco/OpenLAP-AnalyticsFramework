@@ -12,8 +12,10 @@ import javax.persistence.*;
 @Entity
 public class TriadCache {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Type(type = "objectid")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Type(type = "objectid")
     private String id;
 
     private String triadId;

@@ -15,8 +15,10 @@ import java.util.Set;
 @Entity
 public class Question {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Type(type = "objectid")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Type(type = "objectid")
     private String id;
 
     @Column(nullable = false, unique = true)

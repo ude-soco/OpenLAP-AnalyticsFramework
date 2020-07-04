@@ -19,7 +19,7 @@ import com.openlap.AnalyticsMethods.exceptions.AnalyticsMethodsBadRequestExcepti
 import com.openlap.AnalyticsMethods.exceptions.AnalyticsMethodsUploadErrorException;
 import com.openlap.AnalyticsMethods.model.AnalyticsMethods;
 import com.openlap.AnalyticsMethods.services.AnalyticsMethodsService;
-import com.openlap.common.controller.GenericResponseDTO;
+import com.openlap.Common.controller.GenericResponseDTO;
 
 import com.openlap.dataset.OpenLAPColumnConfigData;
 import com.openlap.dataset.OpenLAPDataSetConfigValidationResult;
@@ -39,6 +39,16 @@ public class AnalyticsMethodsController {
 
     @Autowired
     AnalyticsMethodsService analyticsMethodsService;
+
+    @RequestMapping(
+            value = "/PopulateAnalyticsMethods",
+            method = RequestMethod.GET
+    )
+    public
+    @ResponseBody
+    boolean populateAnalyticsMethods(){
+        return analyticsMethodsService.populateAnalyticsMethods();
+    }
 
     /**
      * HTTP endpoint handler method that lists all the Metadata of the  AnalyticsMethods available

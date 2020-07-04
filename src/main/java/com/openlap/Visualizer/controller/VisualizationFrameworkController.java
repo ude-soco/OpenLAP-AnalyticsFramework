@@ -3,16 +3,14 @@ package com.openlap.Visualizer.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlap.Visualizer.dtos.error.BaseErrorDTO;
 import com.openlap.Visualizer.dtos.request.UpdateVisualizationLibraryRequest;
-import com.openlap.Visualizer.dtos.request.UpdateVisualizationTypeRequest;
 import com.openlap.Visualizer.dtos.request.UploadVisualizationLibraryRequest;
 import com.openlap.Visualizer.dtos.request.ValidateVisualizationTypeConfigurationRequest;
 import com.openlap.Visualizer.dtos.response.*;
 import com.openlap.Visualizer.exceptions.*;
-import com.openlap.Visualizer.model.VisualizationDataTransformerMethod;
 import com.openlap.Visualizer.model.VisualizationLibrary;
 import com.openlap.Visualizer.model.VisualizationType;
 import com.openlap.Visualizer.service.VisualizationFrameworkService;
-import com.openlap.common.controller.GenericResponseDTO;
+import com.openlap.Common.controller.GenericResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -51,10 +49,7 @@ public class VisualizationFrameworkController {
      * @param id id of the VisulizationLibrary to be deleted
      * @return GenericResponseDTO with deletion confirmation
      */
-    @RequestMapping(
-            value = "/{id}",
-            method = RequestMethod.DELETE
-    )
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public
     @ResponseBody
     GenericResponseDTO deleteVisualizationLibrary(@PathVariable String id) {
@@ -67,7 +62,6 @@ public class VisualizationFrameworkController {
     public VisualizationLibrary getLibraryDetails(@PathVariable String idOfLibrary) {
 
         return visualizationFrameworkService.findVisualizationLibraryById(idOfLibrary);
-
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -143,6 +137,12 @@ public class VisualizationFrameworkController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<VisualizationLibrary> getVisualizationLibraries() {
         return visualizationFrameworkService.findAllVisualizationLibraries();
+    }
+
+
+    @RequestMapping(value = "/PopulateVisualizations", method = RequestMethod.GET)
+    public boolean populateVisualizations() {
+        return visualizationFrameworkService.populateVisualizations();
     }
 
     @ExceptionHandler(VisualizationLibraryUploadException.class)

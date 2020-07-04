@@ -35,11 +35,7 @@ public class VisualizationLibraryUploadValidator {
                     if (visualizationLibrary.getVisualizationTypes().size() > 0) {
                         for (VisualizationType visualizationType : visualizationLibrary.getVisualizationTypes()) {
                             if (visualizationType.getName() != null && visualizationType.getImplementingClass() != null
-                                    && !visualizationType.getName().isEmpty() && !visualizationType.getImplementingClass().isEmpty()
-                                    && visualizationType.getVisualizationDataTransformerMethod() != null && visualizationType.getVisualizationDataTransformerMethod().getName() != null
-                                    && visualizationType.getVisualizationDataTransformerMethod().getImplementingClass() != null
-                                    && !visualizationType.getVisualizationDataTransformerMethod().getName().isEmpty()
-                                    && !visualizationType.getVisualizationDataTransformerMethod().getImplementingClass().isEmpty()) {
+                                    && !visualizationType.getName().isEmpty() && !visualizationType.getImplementingClass().isEmpty()) {
                                 return false; // do not include in the filtered list
                             } else {
                                 return true;
@@ -64,13 +60,13 @@ public class VisualizationLibraryUploadValidator {
                     try {
                         //Need to optimize TODO
                         VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(LibraryJar.getInputStream());
-                        DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(LibraryJar.getInputStream());
+                        //DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(LibraryJar.getInputStream());
 
                         if (visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationType.getImplementingClass()) == null)
                             return false;
                         //now the data transformer
-                        if (dataTransformerFactory.createDataTransformer(visualizationType.getVisualizationDataTransformerMethod().getImplementingClass()) == null)
-                            return false;
+                        //if (dataTransformerFactory.createDataTransformer(visualizationType.getVisualizationDataTransformerMethod().getImplementingClass()) == null)
+                        //    return false;
                     } catch (DataTransformerCreationException | VisualizationCodeGeneratorCreationException exception) {
                         throw new VisualizationLibraryUploadException(exception.getMessage());
                     }

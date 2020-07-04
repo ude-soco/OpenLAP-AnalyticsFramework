@@ -3,6 +3,7 @@ package com.openlap.AnalyticsModules.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlap.AnalyticsMethods.model.AnalyticsMethods;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -18,8 +19,10 @@ import java.util.*;
 public class AnalyticsGoal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Type(type = "objectid")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Type(type = "objectid")
     String id;
 
     @Column(nullable = false)
@@ -59,7 +62,7 @@ public class AnalyticsGoal {
         this.name = name;
         this.description = description;
         this.author = author;
-        this.isActive = false;
+        this.isActive = isActive;
         this.analyticsMethods = analyticsMethods;
     }
 
@@ -120,7 +123,7 @@ public class AnalyticsGoal {
     }
 
     /**
-     * @return true if the Analyics Goal is active, i.e. can be related with Analyits Methods. False otheriwse.
+     * @return true if the Analytics Goal is active.
      */
     public boolean isActive() {
         return isActive;
@@ -130,7 +133,7 @@ public class AnalyticsGoal {
      * @param isActive Flag to be set.
      */
     public void setActive(boolean isActive) {
-        isActive = isActive;
+        this.isActive = isActive;
     }
 
     /**

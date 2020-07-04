@@ -9,8 +9,7 @@ import com.openlap.AnalyticsModules.exceptions.TriadNotFoundException;
 import com.openlap.AnalyticsModules.model.AnalyticsGoal;
 import com.openlap.AnalyticsModules.model.Triad;
 import com.openlap.AnalyticsModules.service.AnalyticsModulesService;
-import com.openlap.common.controller.GenericResponseDTO;
-import org.bson.types.ObjectId;
+import com.openlap.Common.controller.GenericResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -134,6 +133,17 @@ public class AnalyticsModulesController {
     //endregion
 
     //region AnalyticsGoals
+
+    @RequestMapping(
+            value = "/AnalyticsModules/AnalyticsGoals/PopulateSampleGoals",
+            method = RequestMethod.GET
+    )
+    public
+    @ResponseBody
+    boolean populateSampleGoals(){
+    return modulesService.populateSampleGoals();
+    }
+
 
     /**
      * HTTP endpoint handler method to get a AnalyticsGoal by its ID.
