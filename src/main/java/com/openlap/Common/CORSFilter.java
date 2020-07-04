@@ -1,4 +1,4 @@
-package com.openlap.common;
+package com.openlap.Common;
 
 import org.springframework.stereotype.Component;
 

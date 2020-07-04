@@ -16,10 +16,10 @@ import java.util.Objects;
 @Entity
 public class VisualizationDataTransformerMethod {
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @Type(type = "objectid")
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Type(type = "objectid")
     String id;
 
     //@Column(nullable = false, unique = true)

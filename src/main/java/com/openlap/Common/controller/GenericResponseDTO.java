@@ -1,4 +1,4 @@
-package com.openlap.common.controller;
+package com.openlap.Common.controller;
 
 import java.time.Instant;
 import java.util.HashMap;

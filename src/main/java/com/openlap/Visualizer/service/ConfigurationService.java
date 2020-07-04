@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConfigurationService {
 
-    @Value("${visualizerJarsFolder}")
+    @Value("${visualizer.jars.folder}")
     private String fileManagerStorageLocation;
 
     @Value("${fileManagerTempStorageLocation}")

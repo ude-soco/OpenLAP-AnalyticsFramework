@@ -1,15 +1,13 @@
 package com.openlap.AnalyticsMethods.services;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlap.AnalyticsMethods.exceptions.AnalyticsMethodLoaderException;
 import com.openlap.AnalyticsMethods.exceptions.AnalyticsMethodNotFoundException;
 import com.openlap.AnalyticsMethods.exceptions.AnalyticsMethodsBadRequestException;
 import com.openlap.AnalyticsMethods.exceptions.AnalyticsMethodsUploadErrorException;
 import com.openlap.AnalyticsMethods.model.AnalyticsMethods;
-import com.openlap.AnalyticsModules.exceptions.AnalyticsModulesBadRequestException;
-import com.openlap.AnalyticsModules.model.AnalyticsGoal;
 import com.openlap.OpenLAPAnalyaticsFramework;
+import com.openlap.Common.Utils;
 import com.openlap.template.AnalyticsMethod;
 import com.openlap.dataset.OpenLAPColumnConfigData;
 import com.openlap.dataset.OpenLAPDataSetConfigValidationResult;
@@ -19,22 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.transaction.TransactionManager;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,8 +32,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -376,7 +364,7 @@ public class AnalyticsMethodsService {
                     .map(x -> x.toString()).collect(Collectors.toList());
 
             for (String jarFile : jarFiles) {
-                List<String> classNames = getClassNamesFromJar(jarFile);
+                List<String> classNames = Utils.getClassNamesFromJar(jarFile);
 
                 AnalyticsMethodsClassPathLoader analyticsMethodsClassPathLoader = getFolderNameFromResources(jarFile);
                 List<AnalyticsMethods> newMethods = new ArrayList<>();
@@ -423,28 +411,5 @@ public class AnalyticsMethodsService {
         }
 
         return true;
-    }
-
-    public List<String> getClassNamesFromJar(String JarName) {
-        List<String> listofClasses = new ArrayList<>();
-        try {
-            JarInputStream JarFile = new JarInputStream(new FileInputStream(JarName));
-            JarEntry Jar;
-
-            while (true) {
-                Jar = JarFile.getNextJarEntry();
-                if (Jar == null) {
-                    break;
-                }
-                if ((Jar.getName().endsWith(".class"))) {
-                    String className = Jar.getName().replaceAll("/", "\\.");
-                    String myClass = className.substring(0, className.lastIndexOf('.'));
-                    listofClasses.add(myClass);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Encounter an issue while parsing jar: " + e.toString());
-        }
-        return listofClasses;
     }
 }

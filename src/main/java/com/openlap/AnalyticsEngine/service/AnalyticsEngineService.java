@@ -19,6 +19,7 @@ import com.openlap.AnalyticsModules.model.OpenLAPDataSetMergeMapping;
 import com.openlap.AnalyticsMethods.model.AnalyticsMethods;
 import com.openlap.AnalyticsMethods.services.AnalyticsMethodsService;
 import com.openlap.AnalyticsModules.model.*;
+import com.openlap.Common.Utils;
 import com.openlap.OpenLAPAnalyaticsFramework;
 import com.openlap.Visualizer.dtos.request.GenerateVisualizationCodeRequest;
 import com.openlap.Visualizer.dtos.request.ValidateVisualizationTypeConfigurationRequest;
@@ -124,7 +125,7 @@ public class AnalyticsEngineService {
             Triad triad;
 
             try {
-                String triadJSON = performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/" + params.getOrDefault("tid", ""));
+                String triadJSON = Utils.performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/" + params.getOrDefault("tid", ""));
                 triad = mapper.readValue(triadJSON, Triad.class);
             } catch (Exception exc) {
                 log.error("[Execute],user:"+(userHashId==null?"":userHashId)+",count:"+localExecutionCount+",tid:" + params.getOrDefault("tid", "") + ",time:" + (System.currentTimeMillis()-indicatorExecutionStartTime)+",step:tid-parse,code:unknown,msg:"+exc.getMessage());
@@ -438,7 +439,7 @@ public class AnalyticsEngineService {
                 visualRequest.setParams(additionalParams);
 
                 String visualRequestJSON = mapper.writeValueAsString(visualRequest);
-                GenerateVisualizationCodeResponse visualResponse = performJSONPostRequest(baseUrl + "/generateVisualizationCode", visualRequestJSON, GenerateVisualizationCodeResponse.class);
+                GenerateVisualizationCodeResponse visualResponse = Utils.performJSONPostRequest(baseUrl + "/generateVisualizationCode", visualRequestJSON, GenerateVisualizationCodeResponse.class);
 
                 indicatorCode = visualResponse.getVisualizationCode();
             } catch (Exception exc) {
@@ -446,7 +447,7 @@ public class AnalyticsEngineService {
                 throw new ItemNotFoundException(exc.getMessage(), "1");
             }
 
-            String encodedCode = encodeURIComponent(indicatorCode);
+            String encodedCode = Utils.encodeURIComponent(indicatorCode);
 
             if(performCache){
                 if(isPersonalIndicator)
@@ -484,7 +485,7 @@ public class AnalyticsEngineService {
         IndicatorSaveResponse indicatorResponse = new IndicatorSaveResponse();
 
         try {
-            String triadJSON = performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/" + triadId);
+            String triadJSON = Utils.performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/" + triadId);
             triad = mapper.readValue(triadJSON, Triad.class);
         } catch (Exception exc) {
             indicatorResponse.setIndicatorSaved(false);
@@ -667,7 +668,7 @@ public class AnalyticsEngineService {
 
         List<Triad> triads = null;
         try {
-            String triadsJSON = performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/");
+            String triadsJSON = Utils.performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/");
             triads = mapper.readValue(triadsJSON, mapper.getTypeFactory().constructCollectionType(List.class, Triad.class));
         } catch (Exception exc) {
             throw new ItemNotFoundException("No indicator found", "1");
@@ -858,7 +859,7 @@ public class AnalyticsEngineService {
 
                 //Validating the analytics method
                 try {
-                    String methodValidJSON = performPutRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods/" + previewRequest.getAnalyticsMethodId().get("0") + "/validateConfiguration", queryToMethodConfig.toString());
+                    String methodValidJSON = Utils.performPutRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods/" + previewRequest.getAnalyticsMethodId().get("0") + "/validateConfiguration", queryToMethodConfig.toString());
 
 
                     OpenLAPDataSetConfigValidationResult methodValid = mapper.readValue(methodValidJSON, OpenLAPDataSetConfigValidationResult.class);
@@ -922,7 +923,7 @@ public class AnalyticsEngineService {
                     visRequest.setConfigurationMapping(methodToVisConfig);
                     String visRequestJSON = mapper.writeValueAsString(visRequest);
 
-                    ValidateVisualizationTypeConfigurationResponse visValid = performJSONPostRequest(baseUrl + "/frameworks/" + previewRequest.getVisualizationLibraryId() + "/methods/" + previewRequest.getVisualizationTypeId() + "/validateConfiguration", visRequestJSON, ValidateVisualizationTypeConfigurationResponse.class);
+                    ValidateVisualizationTypeConfigurationResponse visValid = Utils.performJSONPostRequest(baseUrl + "/frameworks/" + previewRequest.getVisualizationLibraryId() + "/methods/" + previewRequest.getVisualizationTypeId() + "/validateConfiguration", visRequestJSON, ValidateVisualizationTypeConfigurationResponse.class);
 
                     if (!visValid.isConfigurationValid()){
                         response.setSuccess(false);
@@ -949,7 +950,7 @@ public class AnalyticsEngineService {
 
                     String visualRequestJSON = mapper.writeValueAsString(visualRequest);
 
-                    GenerateVisualizationCodeResponse visualResponse = performJSONPostRequest(baseUrl + "/generateVisualizationCode", visualRequestJSON, GenerateVisualizationCodeResponse.class);
+                    GenerateVisualizationCodeResponse visualResponse = Utils.performJSONPostRequest(baseUrl + "/generateVisualizationCode", visualRequestJSON, GenerateVisualizationCodeResponse.class);
 
                     indicatorCode = visualResponse.getVisualizationCode();
                 } catch (Exception exc) {
@@ -961,7 +962,7 @@ public class AnalyticsEngineService {
 
                 response.setSuccess(true);
                 response.setErrorMessage("");
-                response.setVisualizationCode(encodeURIComponent(indicatorCode));
+                response.setVisualizationCode(Utils.encodeURIComponent(indicatorCode));
 
             log.info("[Preview-Simple-End],count:"+localPreviewCount+",time:" + (System.currentTimeMillis()-indicatorExecutionStartTime));
 
@@ -1035,7 +1036,7 @@ public class AnalyticsEngineService {
 
                     //Validating the analytics method
                     try {
-                        String methodValidJSON = performPutRequest(baseUrl + "/AnalyticsMethods/" + previewRequest.getAnalyticsMethodId().get(indicatorName) + "/validateConfiguration", queryToMethodConfig.toString());
+                        String methodValidJSON = Utils.performPutRequest(baseUrl + "/AnalyticsMethods/" + previewRequest.getAnalyticsMethodId().get(indicatorName) + "/validateConfiguration", queryToMethodConfig.toString());
                         OpenLAPDataSetConfigValidationResult methodValid = mapper.readValue(methodValidJSON, OpenLAPDataSetConfigValidationResult.class);
 
                         if (!methodValid.isValid()) {
@@ -1121,7 +1122,7 @@ public class AnalyticsEngineService {
 
                     String visRequestJSON = mapper.writeValueAsString(visRequest);
 
-                    ValidateVisualizationTypeConfigurationResponse visValid = performJSONPostRequest(baseUrl + "/frameworks/" + previewRequest.getVisualizationLibraryId() + "/methods/" + previewRequest.getVisualizationTypeId() + "/validateConfiguration", visRequestJSON, ValidateVisualizationTypeConfigurationResponse.class);
+                    ValidateVisualizationTypeConfigurationResponse visValid = Utils.performJSONPostRequest(baseUrl + "/frameworks/" + previewRequest.getVisualizationLibraryId() + "/methods/" + previewRequest.getVisualizationTypeId() + "/validateConfiguration", visRequestJSON, ValidateVisualizationTypeConfigurationResponse.class);
 
                     if (!visValid.isConfigurationValid()){
                         response.setSuccess(false);
@@ -1147,7 +1148,7 @@ public class AnalyticsEngineService {
 
                     String visualRequestJSON = mapper.writeValueAsString(visualRequest);
 
-                    GenerateVisualizationCodeResponse visualResponse = performJSONPostRequest(baseUrl + "/generateVisualizationCode", visualRequestJSON, GenerateVisualizationCodeResponse.class);
+                    GenerateVisualizationCodeResponse visualResponse = Utils.performJSONPostRequest(baseUrl + "/generateVisualizationCode", visualRequestJSON, GenerateVisualizationCodeResponse.class);
 
                     indicatorCode = visualResponse.getVisualizationCode();
                 } catch (Exception exc) {
@@ -1159,7 +1160,7 @@ public class AnalyticsEngineService {
 
                 response.setSuccess(true);
                 response.setErrorMessage("");
-                response.setVisualizationCode(encodeURIComponent(indicatorCode));
+                response.setVisualizationCode(Utils.encodeURIComponent(indicatorCode));
             }
             log.info("[Preview-Composite-End],count:"+localPreviewCount+",time:" + (System.currentTimeMillis()-indicatorExecutionStartTime));
             return response;
@@ -1225,7 +1226,7 @@ public class AnalyticsEngineService {
 
                     //Validating the analytics method
                     try {
-                        String methodValidJSON = performPutRequest(baseUrl + "/AnalyticsMethods/" + previewRequest.getAnalyticsMethodId().get(datasetId) + "/validateConfiguration", queryToMethodConfig.toString());
+                        String methodValidJSON = Utils.performPutRequest(baseUrl + "/AnalyticsMethods/" + previewRequest.getAnalyticsMethodId().get(datasetId) + "/validateConfiguration", queryToMethodConfig.toString());
                         OpenLAPDataSetConfigValidationResult methodValid = mapper.readValue(methodValidJSON, OpenLAPDataSetConfigValidationResult.class);
                         if (!methodValid.isValid()) {
                             response.setSuccess(false);
@@ -1363,7 +1364,7 @@ public class AnalyticsEngineService {
                     ValidateVisualizationTypeConfigurationRequest visRequest = new ValidateVisualizationTypeConfigurationRequest();
                     visRequest.setConfigurationMapping(methodToVisConfig);
                     String visRequestJSON = mapper.writeValueAsString(visRequest);
-                    ValidateVisualizationTypeConfigurationResponse visValid = performJSONPostRequest(baseUrl + "/frameworks/" + previewRequest.getVisualizationLibraryId() + "/methods/" + previewRequest.getVisualizationTypeId() + "/validateConfiguration", visRequestJSON, ValidateVisualizationTypeConfigurationResponse.class);
+                    ValidateVisualizationTypeConfigurationResponse visValid = Utils.performJSONPostRequest(baseUrl + "/frameworks/" + previewRequest.getVisualizationLibraryId() + "/methods/" + previewRequest.getVisualizationTypeId() + "/validateConfiguration", visRequestJSON, ValidateVisualizationTypeConfigurationResponse.class);
 
                     if (!visValid.isConfigurationValid()) {
                         response.setSuccess(false);
@@ -1390,7 +1391,7 @@ public class AnalyticsEngineService {
 
                     String visualRequestJSON = mapper.writeValueAsString(visualRequest);
 
-                    GenerateVisualizationCodeResponse visualResponse = performJSONPostRequest(baseUrl + "/generateVisualizationCode", visualRequestJSON, GenerateVisualizationCodeResponse.class);
+                    GenerateVisualizationCodeResponse visualResponse = Utils.performJSONPostRequest(baseUrl + "/generateVisualizationCode", visualRequestJSON, GenerateVisualizationCodeResponse.class);
 
                     indicatorCode = visualResponse.getVisualizationCode();
                 } catch (Exception exc) {
@@ -1402,7 +1403,7 @@ public class AnalyticsEngineService {
 
                 response.setSuccess(true);
                 response.setErrorMessage("");
-                response.setVisualizationCode(encodeURIComponent(indicatorCode));
+                response.setVisualizationCode(Utils.encodeURIComponent(indicatorCode));
             }
             log.info("[Preview-MLAI-End],count:"+localPreviewCount+",time:" + (System.currentTimeMillis()-indicatorExecutionStartTime));
             return response;
@@ -1584,7 +1585,7 @@ public class AnalyticsEngineService {
         Triad triad;
 
         try {
-            String triadJSON = performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/" + triadId);
+            String triadJSON = Utils.performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/" + triadId);
             triad = mapper.readValue(triadJSON, Triad.class);
         } catch (Exception exc) {
             throw new ItemNotFoundException("Indicator with triad id '" + triadId + "' not found.", "1");
@@ -1641,7 +1642,7 @@ public class AnalyticsEngineService {
         List<AnalyticsMethods> allMethods;
 
         try {
-            String methodsJSON = performGetRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods");
+            String methodsJSON = Utils.performGetRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods");
             allMethods = mapper.readValue(methodsJSON, mapper.getTypeFactory().constructCollectionType(List.class, AnalyticsMethods.class));
         } catch (Exception exc) {
             System.out.println(exc.getMessage());
@@ -1659,7 +1660,7 @@ public class AnalyticsEngineService {
         List<VisualizationLibrary> allVis;
 
         try {
-            String visualizationsJSON = performGetRequest(baseUrl + "/frameworks/list");
+            String visualizationsJSON = Utils.performGetRequest(baseUrl + "/frameworks/list");
             allVis = mapper.readValue(visualizationsJSON,  mapper.getTypeFactory().constructCollectionType(List.class, VisualizationLibrary.class));
         } catch (Exception exc) {
             System.out.println(exc.getMessage());
@@ -1676,7 +1677,7 @@ public class AnalyticsEngineService {
         List<VisualizationLibrary> visMethods;
 
         try {
-            String visualizationsJSON = performGetRequest(baseUrl + "/frameworks/" + libraryid);
+            String visualizationsJSON = Utils.performGetRequest(baseUrl + "/frameworks/" + libraryid);
             visMethods = mapper.readValue(visualizationsJSON,  mapper.getTypeFactory().constructCollectionType(List.class, VisualizationLibrary.class));
         } catch (Exception exc) {
             System.out.println(exc.getMessage());
@@ -1694,7 +1695,7 @@ public class AnalyticsEngineService {
         List<AnalyticsGoal> allGoals;
 
         try {
-            String goalsJSON = performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModule/AnalyticsGoals/");
+            String goalsJSON = Utils.performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModule/AnalyticsGoals/");
             allGoals = mapper.readValue(goalsJSON, mapper.getTypeFactory().constructCollectionType(List.class, AnalyticsGoal.class));
         } catch (Exception exc) {
             System.out.println(exc.getMessage());
@@ -1714,7 +1715,7 @@ public class AnalyticsEngineService {
         List<AnalyticsGoal> allGoals;
 
         try {
-            String goalsJSON = performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/ActiveAnalyticsGoals/");
+            String goalsJSON = Utils.performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/ActiveAnalyticsGoals/");
             allGoals = mapper.readValue(goalsJSON, mapper.getTypeFactory().constructCollectionType(List.class, AnalyticsGoal.class));
         } catch (Exception exc) {
             System.out.println(exc.getMessage());
@@ -1737,7 +1738,7 @@ public class AnalyticsEngineService {
 
             String saveGoalRequestJSON = mapper.writeValueAsString(newGoal);
 
-            AnalyticsGoal savedGoal = performJSONPostRequest(baseUrl + "/analyticsmodule/AnalyticsModules/AnalyticsGoals/", saveGoalRequestJSON, AnalyticsGoal.class);
+            AnalyticsGoal savedGoal = Utils.performJSONPostRequest(baseUrl + "/analyticsmodule/AnalyticsModules/AnalyticsGoals/", saveGoalRequestJSON, AnalyticsGoal.class);
 
             return savedGoal;
         } catch (Exception exc) {
@@ -1760,7 +1761,7 @@ public class AnalyticsEngineService {
 
         try {
 
-            String saveGoalResponseJSON = performPutRequest(baseUrl + "/analyticsmodule/AnalyticsModules/AnalyticsGoals/"+goalId+"/"+setStatus, null);
+            String saveGoalResponseJSON = Utils.performPutRequest(baseUrl + "/analyticsmodule/AnalyticsModules/AnalyticsGoals/"+goalId+"/"+setStatus, null);
             AnalyticsGoal returnedGoal = mapper.readValue(saveGoalResponseJSON, AnalyticsGoal.class);
 
             return returnedGoal;
@@ -1830,7 +1831,7 @@ public class AnalyticsEngineService {
 
                     //Validating the data to method port configuration
                     String queryToMethodConfigJSON = methodConfig.getValue().toString();
-                    String queryToMethodConfigValidJSON = performPutRequest(baseUrl + "/AnalyticsMethods/"+indicatorRequest.getAnalyticsMethodId().get(methodConfig.getKey())+"/validateConfiguration", queryToMethodConfigJSON);
+                    String queryToMethodConfigValidJSON = Utils.performPutRequest(baseUrl + "/AnalyticsMethods/"+indicatorRequest.getAnalyticsMethodId().get(methodConfig.getKey())+"/validateConfiguration", queryToMethodConfigJSON);
                     OpenLAPDataSetConfigValidationResult queryToMethodConfigValid =  mapper.readValue(queryToMethodConfigValidJSON, OpenLAPDataSetConfigValidationResult.class);
                     if(!queryToMethodConfigValid.isValid()){
                         indicatorResponse.setIndicatorSaved(false);
@@ -1842,9 +1843,9 @@ public class AnalyticsEngineService {
                     queryToMethodReference.getPortConfigs().put(methodConfig.getKey(), methodConfig.getValue());
                 }
                 VisualizerReference visualizerReference;
-                String visFrameworkJSON = performGetRequest(baseUrl + "/frameworks/" + indicatorRequest.getVisualizationLibraryId());
+                String visFrameworkJSON = Utils.performGetRequest(baseUrl + "/frameworks/" + indicatorRequest.getVisualizationLibraryId());
                 VisualizationLibraryDetailsResponse frameworkResponse = mapper.readValue(visFrameworkJSON, VisualizationLibraryDetailsResponse.class);
-                String visMethodJSON = performGetRequest(baseUrl + "/frameworks/"+ indicatorRequest.getVisualizationLibraryId() + "/methods/"+ indicatorRequest.getVisualizationTypeId());
+                String visMethodJSON = Utils.performGetRequest(baseUrl + "/frameworks/"+ indicatorRequest.getVisualizationLibraryId() + "/methods/"+ indicatorRequest.getVisualizationTypeId());
                 VisualizationTypeDetailsResponse methodResponse = mapper.readValue(visMethodJSON, VisualizationTypeDetailsResponse.class);
                 visualizerReference = new VisualizerReference(
                         frameworkResponse.getVisualizationLibrary().getId(),
@@ -1855,7 +1856,7 @@ public class AnalyticsEngineService {
                 ValidateVisualizationTypeConfigurationRequest methodToVisConfigRequest = new ValidateVisualizationTypeConfigurationRequest();
                 methodToVisConfigRequest.setConfigurationMapping(indicatorRequest.getMethodToVisualizationConfig());
 
-                ValidateVisualizationTypeConfigurationResponse methodToVisConfigValid = performJSONPostRequest(baseUrl + "/frameworks/"+ indicatorRequest.getVisualizationLibraryId() + "/methods/"+ indicatorRequest.getVisualizationTypeId() +"/validateConfiguration", mapper.writeValueAsString(methodToVisConfigRequest), ValidateVisualizationTypeConfigurationResponse.class);
+                ValidateVisualizationTypeConfigurationResponse methodToVisConfigValid = Utils.performJSONPostRequest(baseUrl + "/frameworks/"+ indicatorRequest.getVisualizationLibraryId() + "/methods/"+ indicatorRequest.getVisualizationTypeId() +"/validateConfiguration", mapper.writeValueAsString(methodToVisConfigRequest), ValidateVisualizationTypeConfigurationResponse.class);
 
                 if(!methodToVisConfigValid.isConfigurationValid()){
                     indicatorResponse.setIndicatorSaved(false);
@@ -1870,7 +1871,7 @@ public class AnalyticsEngineService {
                 triad.setParameters(indicatorRequest.getParameters());
                 String triadJSON = triad.toString();
 
-                Triad savedTriad = performJSONPostRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/", triadJSON, Triad.class);
+                Triad savedTriad = Utils.performJSONPostRequest(baseUrl + "/analyticsmodule/AnalyticsModules/Triads/", triadJSON, Triad.class);
 
                 triads.add(savedTriad);
                 em.getTransaction().begin();
@@ -1903,8 +1904,8 @@ public class AnalyticsEngineService {
     private String getIndicatorRequestCode(Triad triad) {
         String visFrameworkScript = "";
         try{
-            visFrameworkScript = performGetRequest(visualizerURL + "/frameworks/" + triad.getVisualizationReference().getLibraryId() + "/methods/"+ triad.getVisualizationReference().getTypeId() + "/frameworkScript");
-            visFrameworkScript = decodeURIComponent(visFrameworkScript);
+            visFrameworkScript = Utils.performGetRequest(visualizerURL + "/frameworks/" + triad.getVisualizationReference().getLibraryId() + "/methods/"+ triad.getVisualizationReference().getTypeId() + "/frameworkScript");
+            visFrameworkScript = Utils.decodeURIComponent(visFrameworkScript);
         } catch (Exception exc) {
             throw new ItemNotFoundException(exc.getMessage(),"1");
         }
@@ -1995,7 +1996,7 @@ public class AnalyticsEngineService {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            String methodInputsJSON = performGetRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods/"+id+"/getInputPorts");
+            String methodInputsJSON = Utils.performGetRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods/"+id+"/getInputPorts");
             methodInputs = mapper.readValue(methodInputsJSON, mapper.getTypeFactory().constructCollectionType(List.class, OpenLAPColumnConfigData.class));
         } catch (Exception exc) {
             System.out.println(exc.getMessage());
@@ -2012,7 +2013,7 @@ public class AnalyticsEngineService {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            String methodInputsJSON = performGetRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods/"+id+"/getOutputPorts");
+            String methodInputsJSON = Utils.performGetRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods/"+id+"/getOutputPorts");
             methodInputs = mapper.readValue(methodInputsJSON, mapper.getTypeFactory().constructCollectionType(List.class, OpenLAPColumnConfigData.class));
         } catch (Exception exc) {
             System.out.println(exc.getMessage());
@@ -2029,7 +2030,7 @@ public class AnalyticsEngineService {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            String methodInputsJSON = performGetRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods/"+id+"/getDynamicParams");
+            String methodInputsJSON = Utils.performGetRequest(baseUrl + "/AnalyticsMethod/AnalyticsMethods/"+id+"/getDynamicParams");
             methodParams = mapper.readValue(methodInputsJSON, mapper.getTypeFactory().constructCollectionType(List.class, OpenLAPDynamicParam.class));
             Collections.sort(methodParams, (OpenLAPDynamicParam o1, OpenLAPDynamicParam o2) -> (o1.getTitle().compareTo(o2.getTitle())));
         } catch (Exception exc) {
@@ -2049,7 +2050,7 @@ public class AnalyticsEngineService {
             ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 
 
-            String methodInputsJSON = performGetRequest(baseUrl + "/frameworks/"+frameworkId+"/methods/"+methodId+"/configuration");
+            String methodInputsJSON = Utils.performGetRequest(baseUrl + "/frameworks/"+frameworkId+"/methods/"+methodId+"/configuration");
             VisualizationTypeConfigurationResponse visResponse = mapper.readValue(methodInputsJSON, VisualizationTypeConfigurationResponse.class);
 
             methodInputs = visResponse.getTypeConfiguration().getInput().getColumnsConfigurationData();
@@ -2161,125 +2162,23 @@ public class AnalyticsEngineService {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/AnalyticsGoals/PopulateSampleGoals");
+            Utils.performGetRequest(baseUrl + "/analyticsmodule/AnalyticsModules/AnalyticsGoals/PopulateSampleGoals");
         } catch (Exception exc) {
-            System.out.println("Adding Analytics Goals: "+ exc.getMessage());
+            System.out.println("Adding Analytics Goals: " + exc.getMessage());
         }
 
         try {
-            performGetRequest(baseUrl + "/AnalyticsMethod/PopulateAnalyticsMethods");
+            Utils.performGetRequest(baseUrl + "/AnalyticsMethod/PopulateAnalyticsMethods");
         } catch (Exception exc) {
-            System.out.println("Adding Analytics Methods: "+ exc.getMessage());
+            System.out.println("Adding Analytics Methods: " + exc.getMessage());
+        }
+
+        try {
+            Utils.performGetRequest(baseUrl + "/frameworks/PopulateVisualizations");
+        } catch (Exception exc) {
+            System.out.println("Adding Visualization Techniques: "+ exc.getMessage());
         }
 
         return "Success";
     }
-
-
-    //HTTP Section
-
-    public String performGetRequest(String url) throws Exception {
-        URL obj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("GET");
-        int responseCode = con.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            return response.toString();
-        } else {
-            throw new Exception(con.getResponseMessage());
-        }
-    }
-
-    public <T> T performJSONPostRequest(String url, String jsonContent, Class<T> type) throws Exception{
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Accept","application/json;charset=utf-8");
-
-        HttpEntity<String> entity = new HttpEntity<String>(jsonContent,headers);
-
-        restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-
-        T result = restTemplate.postForObject(url, entity, type);
-
-        return result;
-    }
-
-    public String performPutRequest(String url, String jsonContent) throws Exception {
-        URL obj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("PUT");
-        con.setRequestProperty("Content-Type", "application/json");
-        con.setRequestProperty("Accept", "application/json");
-        con.setRequestProperty("Content-Length", "" + Integer.toString(jsonContent.getBytes().length));
-
-        con.setUseCaches(false);
-        con.setDoInput(true);
-        con.setDoOutput(true);
-
-        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-        wr.writeBytes(jsonContent);
-        wr.flush();
-        wr.close();
-
-        int responseCode = con.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            return response.toString();
-        } else {
-            throw new Exception(con.getResponseMessage());
-        }
-    }
-
-    public String decodeURIComponent(String s) {
-        if (s == null) {
-            return null;
-        }
-
-        String result = null;
-
-        try {
-            result = URLDecoder.decode(s, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e) {
-            result = s;
-        }
-
-        return result;
-    }
-
-    public String encodeURIComponent(String s) {
-        String result = null;
-
-        try {
-            result = URLEncoder.encode(s, "UTF-8")
-                    .replaceAll("\\%28", "(")
-                    .replaceAll("\\%29", ")")
-                    .replaceAll("\\+", "%20")
-                    .replaceAll("\\%27", "'")
-                    .replaceAll("\\%21", "!")
-                    .replaceAll("\\%7E", "~");
-        } catch (UnsupportedEncodingException e) {
-            result = s;
-        }
-        return result;
-    }
-
 }

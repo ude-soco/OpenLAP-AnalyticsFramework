@@ -51,7 +51,7 @@
     <dependency>
         <groupId>com.github.ude-soco</groupId>
         <artifactId>OpenLAP-VisualizationTechniqueTemplate</artifactId>
-        <version>v1.0.0</version>
+        <version>v2.0.0</version>
     </dependency>
     <dependency>
         <groupId>com.github.ude-soco</groupId>
@@ -185,11 +185,11 @@
     	<version>2.9.6</version>
 	</dependency>
 	<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
-	<dependency>
-    	<groupId>org.apache.httpcomponents</groupId>
-    	<artifactId>httpclient</artifactId>
-    	<version>4.1.1</version>
-	</dependency>
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>[4.3.6,)</version>
+    </dependency>
 	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
 	<dependency>
     	<groupId>org.apache.commons</groupId>

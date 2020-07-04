@@ -32,10 +32,19 @@ public class VisualizationEngineController {
         GenerateVisualizationCodeResponse visualizationCodeResponse = new GenerateVisualizationCodeResponse();
         //check which service method to invoke
 
-        if (generateVisualizationCodeRequest.getLibraryId() == null && generateVisualizationCodeRequest.getTypeId() == null )
-            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getLibraryName(), generateVisualizationCodeRequest.getTypeName(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getParams()));
-        else
-            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCodes(generateVisualizationCodeRequest.getLibraryId(), generateVisualizationCodeRequest.getTypeId(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getParams()));
+        try {
+            if (generateVisualizationCodeRequest.getLibraryId() == null && generateVisualizationCodeRequest.getTypeId() == null)
+                visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getLibraryName(), generateVisualizationCodeRequest.getTypeName(), generateVisualizationCodeRequest.getDataSet(), generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getParams()));
+            else
+                visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCodes(generateVisualizationCodeRequest.getLibraryId(), generateVisualizationCodeRequest.getTypeId(), generateVisualizationCodeRequest.getDataSet(), generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getParams()));
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+
         return visualizationCodeResponse;
     }
 

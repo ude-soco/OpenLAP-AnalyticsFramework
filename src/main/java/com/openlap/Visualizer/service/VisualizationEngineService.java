@@ -1,5 +1,8 @@
 package com.openlap.Visualizer.service;
 
+import com.openlap.AnalyticsMethods.model.AnalyticsMethods;
+import com.openlap.AnalyticsMethods.services.AnalyticsMethodsClassPathLoader;
+import com.openlap.Common.Utils;
 import com.openlap.Visualizer.exceptions.VisualizationCodeGenerationException;
 import com.openlap.Visualizer.framework.factory.DataTransformerFactory;
 import com.openlap.Visualizer.framework.factory.DataTransformerFactoryImpl;
@@ -10,16 +13,26 @@ import com.openlap.Visualizer.model.VisualizationType;
 import com.openlap.dataset.OpenLAPDataSet;
 import com.openlap.dataset.OpenLAPPortConfig;
 
+import com.openlap.template.AnalyticsMethod;
 import com.openlap.template.DataTransformer;
 import com.openlap.template.VisualizationCodeGenerator;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.transaction.TransactionManager;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Service which provides methods to generate visualization code. The service can thought of as the orchestrator which takes care of calling the
@@ -43,7 +56,7 @@ public class VisualizationEngineService {
      * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
-    public String generateClientVisualizationCode(String libraryName, String typeName, OpenLAPDataSet dataSet, OpenLAPPortConfig portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
+    public String generateClientVisualizationCode(String libraryName, String typeName, OpenLAPDataSet dataSet, OpenLAPPortConfig portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException, InstantiationException, IllegalAccessException {
         VisualizationLibrary visualizationLibrary = em.find(VisualizationLibrary.class, libraryName);
         VisualizationType visualizationType = em.find(VisualizationType.class, typeName);
 
@@ -56,11 +69,11 @@ public class VisualizationEngineService {
             //visualization method found
             //VisualizationType visType = visualizationType.get();
             //ask the factories for the instances
-            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(visualizationLibrary.getFrameworkLocation());
+            //DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(visualizationLibrary.getFrameworkLocation());
             VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationLibrary.getFrameworkLocation());
             VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationType.getImplementingClass());
-            DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visualizationType.getVisualizationDataTransformerMethod().getImplementingClass());
-            return codeGenerator.generateVisualizationCode(dataSet,portConfiguration, dataTransformer, additionalParams);
+            //DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visualizationType.getVisualizationDataTransformerMethod().getImplementingClass());
+            return codeGenerator.generateVisualizationCode(dataSet, portConfiguration, additionalParams);
         } else {
             throw new VisualizationCodeGenerationException("The method: " + typeName + " for the framework: " + libraryName + " was not found");
         }
@@ -75,7 +88,7 @@ public class VisualizationEngineService {
      * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
-    public String generateClientVisualizationCodes(String libraryId, String typeId, OpenLAPDataSet olapDataSet, OpenLAPPortConfig portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
+    public String generateClientVisualizationCodes(String libraryId, String typeId, OpenLAPDataSet olapDataSet, OpenLAPPortConfig portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException, InstantiationException, IllegalAccessException {
         VisualizationLibrary visualizationLibrary = em.find(VisualizationLibrary.class,libraryId);
         VisualizationType visualizationType = em.find(VisualizationType.class, typeId);
 /*        Optional<VisualizationType> visualizationType= visualizationLibrary.getVisualizationTypes()
@@ -87,11 +100,11 @@ public class VisualizationEngineService {
             //VisualizationType visMethod = visualizationType.get();
 
             //ask the factories for the instances
-            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(visualizationLibrary.getFrameworkLocation());
+            //DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(visualizationLibrary.getFrameworkLocation());
             VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationLibrary.getFrameworkLocation());
-            DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visualizationType.getVisualizationDataTransformerMethod().getImplementingClass());
+           // DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visualizationType.getVisualizationDataTransformerMethod().getImplementingClass());
             VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationType.getImplementingClass());
-            return codeGenerator.generateVisualizationCode(olapDataSet,portConfiguration, dataTransformer, additionalParams);
+            return codeGenerator.generateVisualizationCode(olapDataSet,portConfiguration, additionalParams);
         } else {
             throw new VisualizationCodeGenerationException("The method: " + typeId + " for the framework: " + libraryId + " was not found");
         }
